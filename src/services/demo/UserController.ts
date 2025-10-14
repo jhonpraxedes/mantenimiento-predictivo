@@ -1,8 +1,8 @@
 /* eslint-disable */
-// 该文件由 OneAPI 自动生成，请勿手动修改！
+// Este archivo es generado automáticamente por OneAPI, no modificar manualmente
 import { request } from '@umijs/max';
 
-/** 此处后端没有提供注释 GET /api/v1/queryUserList */
+/** El backend no proporcionó comentarios para este endpoint GET /api/v1/queryUserList */
 export async function queryUserList(
   params: {
     // query
@@ -24,7 +24,7 @@ export async function queryUserList(
   });
 }
 
-/** 此处后端没有提供注释 POST /api/v1/user */
+/** El backend no proporcionó comentarios para este endpoint POST /api/v1/user */
 export async function addUser(
   body?: API.UserInfoVO,
   options?: { [key: string]: any },
@@ -39,7 +39,7 @@ export async function addUser(
   });
 }
 
-/** 此处后端没有提供注释 GET /api/v1/user/${param0} */
+/** El backend no proporcionó comentarios para este endpoint GET /api/v1/user/${param0} */
 export async function getUserDetail(
   params: {
     // path
@@ -56,7 +56,7 @@ export async function getUserDetail(
   });
 }
 
-/** 此处后端没有提供注释 PUT /api/v1/user/${param0} */
+/** El backend no proporcionó comentarios para este endpoint PUT /api/v1/user/${param0} */
 export async function modifyUser(
   params: {
     // path
@@ -78,7 +78,7 @@ export async function modifyUser(
   });
 }
 
-/** 此处后端没有提供注释 DELETE /api/v1/user/${param0} */
+/** El backend no proporcionó comentarios para este endpoint DELETE /api/v1/user/${param0} */
 export async function deleteUser(
   params: {
     // path

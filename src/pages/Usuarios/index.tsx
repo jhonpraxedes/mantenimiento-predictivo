@@ -3,8 +3,8 @@ import {
   ActionType,
   FooterToolbar,
   PageContainer,
+  ProColumns,
   ProDescriptions,
-  ProDescriptionsItemProps,
   ProTable,
 } from '@ant-design/pro-components';
 import { Button, Divider, Drawer, message } from 'antd';
@@ -16,29 +16,29 @@ const { addUser, queryUserList, deleteUser, modifyUser } =
   services.UserController;
 
 /**
- * 添加节点
+ * Agregar usuario
  * @param fields
  */
 const handleAdd = async (fields: API.UserInfo) => {
-  const hide = message.loading('正在添加');
+  const hide = message.loading('Agregando...');
   try {
     await addUser({ ...fields });
     hide();
-    message.success('添加成功');
+    message.success('Agregado correctamente');
     return true;
   } catch (error) {
     hide();
-    message.error('添加失败请重试！');
+    message.error('No se pudo agregar. Intenta de nuevo.');
     return false;
   }
 };
 
 /**
- * 更新节点
+ * Actualizar usuario
  * @param fields
  */
 const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('正在配置');
+  const hide = message.loading('Guardando cambios...');
   try {
     await modifyUser(
       {
@@ -52,32 +52,36 @@ const handleUpdate = async (fields: FormValueType) => {
     );
     hide();
 
-    message.success('配置成功');
+    message.success('Cambios guardados');
     return true;
   } catch (error) {
     hide();
-    message.error('配置失败请重试！');
+    message.error('No se pudieron guardar los cambios. Intenta de nuevo.');
     return false;
   }
 };
 
 /**
- *  删除节点
+ * Eliminar usuarios
  * @param selectedRows
  */
 const handleRemove = async (selectedRows: API.UserInfo[]) => {
-  const hide = message.loading('正在删除');
+  const hide = message.loading('Eliminando...');
   if (!selectedRows) return true;
   try {
-    await deleteUser({
-      userId: selectedRows.find((row) => row.id)?.id || '',
-    });
+    await Promise.all(
+      selectedRows.map((row) =>
+        deleteUser({
+          userId: row.id || '',
+        }),
+      ),
+    );
     hide();
-    message.success('删除成功，即将刷新');
+    message.success('Eliminado correctamente. Actualizando...');
     return true;
   } catch (error) {
     hide();
-    message.error('删除失败，请重试');
+    message.error('No se pudo eliminar. Intenta de nuevo.');
     return false;
   }
 };
@@ -90,36 +94,37 @@ const TableList: React.FC<unknown> = () => {
   const actionRef = useRef<ActionType>();
   const [row, setRow] = useState<API.UserInfo>();
   const [selectedRowsState, setSelectedRows] = useState<API.UserInfo[]>([]);
-  const columns: ProDescriptionsItemProps<API.UserInfo>[] = [
+
+  const columns: ProColumns<API.UserInfo>[] = [
     {
-      title: '名称',
+      title: 'Nombre',
       dataIndex: 'name',
-      tip: '名称是唯一的 key',
+      tip: 'El nombre es una clave única',
       formItemProps: {
         rules: [
           {
             required: true,
-            message: '名称为必填项',
+            message: 'El nombre es obligatorio',
           },
         ],
       },
     },
     {
-      title: '昵称',
+      title: 'Apodo',
       dataIndex: 'nickName',
       valueType: 'text',
     },
     {
-      title: '性别',
+      title: 'Género',
       dataIndex: 'gender',
       hideInForm: true,
       valueEnum: {
-        0: { text: '男', status: 'MALE' },
-        1: { text: '女', status: 'FEMALE' },
+        0: { text: 'Hombre', status: 'MALE' },
+        1: { text: 'Mujer', status: 'FEMALE' },
       },
     },
     {
-      title: '操作',
+      title: 'Acciones',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => (
@@ -130,10 +135,16 @@ const TableList: React.FC<unknown> = () => {
               setStepFormValues(record);
             }}
           >
-            配置
+            Editar
           </a>
           <Divider type="vertical" />
-          <a href="">订阅警报</a>
+          <a
+            onClick={() => {
+              setRow(record);
+            }}
+          >
+            Ver detalles
+          </a>
         </>
       ),
     },
@@ -142,11 +153,11 @@ const TableList: React.FC<unknown> = () => {
   return (
     <PageContainer
       header={{
-        title: 'CRUD 示例',
+        title: 'Ejemplo CRUD',
       }}
     >
       <ProTable<API.UserInfo>
-        headerTitle="查询表格"
+        headerTitle="Tabla de consulta"
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -158,7 +169,7 @@ const TableList: React.FC<unknown> = () => {
             type="primary"
             onClick={() => handleModalVisible(true)}
           >
-            新建
+            Nuevo
           </Button>,
         ]}
         request={async (params, sorter, filter) => {
@@ -183,9 +194,9 @@ const TableList: React.FC<unknown> = () => {
         <FooterToolbar
           extra={
             <div>
-              已选择{' '}
+              Seleccionados{' '}
               <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              项&nbsp;&nbsp;
+              ítems&nbsp;&nbsp;
             </div>
           }
         >
@@ -196,9 +207,9 @@ const TableList: React.FC<unknown> = () => {
               actionRef.current?.reloadAndRest?.();
             }}
           >
-            批量删除
+            Eliminar seleccionados
           </Button>
-          <Button type="primary">批量审批</Button>
+          <Button type="primary">Aprobar seleccionados</Button>
         </FooterToolbar>
       )}
       <CreateForm
@@ -259,7 +270,7 @@ const TableList: React.FC<unknown> = () => {
             params={{
               id: row?.name,
             }}
-            columns={columns}
+            columns={columns as any}
           />
         )}
       </Drawer>

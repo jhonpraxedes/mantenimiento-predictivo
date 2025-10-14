@@ -8,11 +8,11 @@ const AccessPage: React.FC = () => {
     <PageContainer
       ghost
       header={{
-        title: '权限示例',
+        title: 'Ejemplo de permisos',
       }}
     >
       <Access accessible={access.canSeeAdmin}>
-        <Button>只有 Admin 可以看到这个按钮</Button>
+        <Button>Solo el Admin puede ver este botón</Button>
       </Access>
     </PageContainer>
   );
