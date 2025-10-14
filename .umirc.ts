@@ -29,6 +29,8 @@ export default defineConfig({
       path: '/usuarios',
       component: './Usuarios',
     },
+
+    { name: 'Reportes', path: '/reportes', component: './Reportes' },
   ],
   npmClient: 'pnpm',
 });

@@ -3,12 +3,12 @@
 // Datos de inicialización global, usados para Layout (usuario y permisos).
 // Más info: https://umijs.org/docs/api/runtime-config#getinitialstate
 export async function getInitialState(): Promise<{ name: string }> {
-  return { name: 'Demo Ant Design Pro' };
+  return { name: 'SISTEMA DE MANTENIMIENTO PREDICTIVO' };
 }
 
 export const layout = () => {
   return {
-    logo: 'https://img.alicdn.com/tfs/TB1YHEpwUT1gK0jSZFhXXaAtVXa-28-27.svg',
+    logo: '/icons/img1.svg', // Usa tu SVG local
     menu: {
       locale: false,
     },
