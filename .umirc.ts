@@ -6,8 +6,14 @@ export default defineConfig({
   model: {},
   initialState: {},
   request: {},
+  locale: {
+    default: 'es-ES',
+    antd: true,
+    baseSeparator: '-',
+  },
   layout: {
     title: 'Mantenimiento Predictivo',
+    locale: true,
   },
   routes: [
     {
@@ -23,6 +29,12 @@ export default defineConfig({
       name: 'Control Maquinaria',
       path: '/control-maquinaria',
       component: './ControlMaquinaria',
+    },
+    {
+      name: 'Ingreso',
+      path: '/ingreso',
+      component: './Ingreso',
+      access: 'canSeeAdmin', // Solo admin
     },
     {
       name: 'Usuarios',
