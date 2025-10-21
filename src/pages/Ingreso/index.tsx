@@ -1,16 +1,10 @@
-import {
-  ESTADOS_MAQUINARIA,
-  Maquinaria,
-  TIPOS_MAQUINARIA,
-} from '@/constants/maquinaria';
+import { Maquinaria, TIPOS_MAQUINARIA } from '@/constants/maquinaria';
 import { MaquinariaStore } from '@/services/maquinariaLocal';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-components';
 import {
   ModalForm,
   PageContainer,
-  ProFormDatePicker,
-  ProFormDigit,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
@@ -19,20 +13,19 @@ import {
 import { Button, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 
-const IngresoPage: React.FC = () => {
+const Ingreso: React.FC = () => {
   const [maquinas, setMaquinas] = useState<Maquinaria[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Cargar datos
   const cargarDatos = async () => {
     setLoading(true);
     try {
       const data = await MaquinariaStore.list();
       setMaquinas(data);
-    } catch (error) {
-      message.error('Error al cargar datos');
+    } catch {
+      message.error('Error al cargar maquinaria');
     } finally {
       setLoading(false);
     }
@@ -42,7 +35,6 @@ const IngresoPage: React.FC = () => {
     cargarDatos();
   }, []);
 
-  // Crear o actualizar
   const handleSubmit = async (values: any) => {
     try {
       if (editingId) {
@@ -62,88 +54,63 @@ const IngresoPage: React.FC = () => {
     }
   };
 
-  // Eliminar
-  const handleDelete = async (id: string) => {
-    try {
-      await MaquinariaStore.delete(id);
-      message.success('Máquina eliminada correctamente');
-      cargarDatos();
-    } catch (error) {
-      message.error('Error al eliminar');
-    }
-  };
-
-  // Abrir modal para editar
   const handleEdit = (record: Maquinaria) => {
     setEditingId(record.id);
     setModalVisible(true);
   };
 
-  // Columnas de la tabla
+  const handleDelete = async (id: string) => {
+    try {
+      await MaquinariaStore.delete(id);
+      message.success('Eliminado correctamente');
+      cargarDatos();
+    } catch {
+      message.error('Error al eliminar maquinaria');
+    }
+  };
+
   const columns: ProColumns<Maquinaria>[] = [
-    {
-      title: 'Código',
-      dataIndex: 'codigo',
-      width: 100,
-      fixed: 'left',
-    },
     {
       title: 'Nombre',
       dataIndex: 'nombre',
       width: 200,
+      fixed: 'left',
     },
     {
       title: 'Tipo',
       dataIndex: 'tipo',
       width: 150,
-      filters: TIPOS_MAQUINARIA.map((t) => ({ text: t, value: t })),
-      onFilter: (value, record) => record.tipo === value,
-    },
-    {
-      title: 'Marca',
-      dataIndex: 'marca',
-      width: 120,
-    },
-    {
-      title: 'Modelo',
-      dataIndex: 'modelo',
-      width: 120,
-    },
-    {
-      title: 'N° Serie',
-      dataIndex: 'numero_serie',
-      width: 150,
-    },
-    {
-      title: 'Horas de Uso',
-      dataIndex: 'horasUsoActual',
-      width: 120,
-      render: (val) => `${val} hrs`,
-    },
-    {
-      title: 'Estado',
-      dataIndex: 'estado',
-      width: 120,
-      filters: ESTADOS_MAQUINARIA.map((e) => ({ text: e, value: e })),
-      onFilter: (value, record) => record.estado === value,
       render: (_, record) => {
         const color =
-          record.estado === 'Operativa'
-            ? 'green'
-            : record.estado === 'Mantenimiento'
+          record.tipo === 'Excavadora'
+            ? 'blue'
+            : record.tipo === 'Bulldozer'
+            ? 'red'
+            : record.tipo === 'Cargador frontal'
             ? 'orange'
-            : 'red';
-        return <Tag color={color}>{record.estado}</Tag>;
+            : 'green';
+        return <Tag color={color}>{record.tipo}</Tag>;
       },
     },
     {
-      title: 'Ubicación',
-      dataIndex: 'ubicacion',
-      width: 150,
+      title: 'Descripción',
+      dataIndex: 'descripcion',
+      width: 300,
+    },
+    {
+      title: 'Número de Serie',
+      dataIndex: 'numero_serie',
+      width: 180,
+    },
+    {
+      title: 'Motor',
+      dataIndex: 'motor',
+      width: 180,
     },
     {
       title: 'Acciones',
-      width: 150,
+      key: 'actions',
+      width: 160,
       fixed: 'right',
       render: (_, record) => (
         <Space>
@@ -155,7 +122,7 @@ const IngresoPage: React.FC = () => {
             Editar
           </Button>
           <Popconfirm
-            title="¿Está seguro de eliminar esta máquina?"
+            title="¿Deseas eliminar esta máquina?"
             onConfirm={() => handleDelete(record.id)}
             okText="Sí"
             cancelText="No"
@@ -182,10 +149,10 @@ const IngresoPage: React.FC = () => {
         rowKey="id"
         loading={loading}
         search={false}
-        scroll={{ x: 1500 }}
+        pagination={{ pageSize: 5 }}
         toolBarRender={() => [
           <Button
-            key="button"
+            key="add"
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
@@ -193,22 +160,17 @@ const IngresoPage: React.FC = () => {
               setModalVisible(true);
             }}
           >
-            Nueva Máquina
+            Nueva Maquinaria
           </Button>,
         ]}
-        pagination={{
-          pageSize: 10,
-          showSizeChanger: true,
-          showTotal: (total) => `Total: ${total} máquinas`,
-        }}
       />
 
       <ModalForm
-        title={editingId ? 'Editar Máquina' : 'Nueva Máquina'}
+        title={editingId ? 'Editar Maquinaria' : 'Nueva Maquinaria'}
         open={modalVisible}
         onOpenChange={setModalVisible}
         onFinish={handleSubmit}
-        width={800}
+        width={500}
         request={async () => {
           if (editingId) {
             const maquina = await MaquinariaStore.get(editingId);
@@ -216,86 +178,42 @@ const IngresoPage: React.FC = () => {
           }
           return {};
         }}
-        layout="horizontal"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
       >
-        <ProFormText
-          name="codigo"
-          label="Código"
-          placeholder="Ej: EXC-001"
-          rules={[{ required: true, message: 'Ingrese el código' }]}
-        />
+        {/* Campos del formulario */}
         <ProFormText
           name="nombre"
           label="Nombre"
-          placeholder="Ej: Excavadora Principal"
-          rules={[{ required: true, message: 'Ingrese el nombre' }]}
+          placeholder="Ej: Excavadora CAT 320D"
+          rules={[{ required: true, message: 'El nombre es obligatorio' }]}
         />
         <ProFormSelect
           name="tipo"
-          label="Tipo"
+          label="Tipo de maquinaria"
           options={TIPOS_MAQUINARIA.map((t) => ({ label: t, value: t }))}
-          rules={[{ required: true, message: 'Seleccione el tipo' }]}
-        />
-        <ProFormText
-          name="numero_serie"
-          label="Número de Serie"
-          placeholder="Ej: CAT320D-12345"
-          rules={[{ required: true, message: 'Ingrese el número de serie' }]}
-        />
-        <ProFormText
-          name="marca"
-          label="Marca"
-          placeholder="Ej: Caterpillar"
-          rules={[{ required: true, message: 'Ingrese la marca' }]}
-        />
-        <ProFormText
-          name="modelo"
-          label="Modelo"
-          placeholder="Ej: 320D"
-          rules={[{ required: true, message: 'Ingrese el modelo' }]}
-        />
-        <ProFormText name="motor" label="Motor" placeholder="Ej: C6.6 ACERT" />
-        <ProFormDatePicker
-          name="fecha_adquisicion"
-          label="Fecha de Adquisición"
-          rules={[{ required: true, message: 'Seleccione la fecha' }]}
-        />
-        <ProFormDigit
-          name="horasUsoInicial"
-          label="Horas de Uso Inicial"
-          min={0}
-          fieldProps={{ precision: 2 }}
-          initialValue={0}
-        />
-        <ProFormDigit
-          name="horasUsoActual"
-          label="Horas de Uso Actual"
-          min={0}
-          fieldProps={{ precision: 2 }}
-          rules={[{ required: true, message: 'Ingrese las horas actuales' }]}
-        />
-        <ProFormSelect
-          name="estado"
-          label="Estado"
-          options={ESTADOS_MAQUINARIA.map((e) => ({ label: e, value: e }))}
-          initialValue="Operativa"
-          rules={[{ required: true, message: 'Seleccione el estado' }]}
-        />
-        <ProFormText
-          name="ubicacion"
-          label="Ubicación"
-          placeholder="Ej: Zona Norte"
+          placeholder="Selecciona el tipo"
+          rules={[{ required: true, message: 'El tipo es obligatorio' }]}
         />
         <ProFormTextArea
           name="descripcion"
           label="Descripción"
-          placeholder="Descripción adicional (opcional)"
+          placeholder="Descripción breve de la máquina"
+        />
+        <ProFormText
+          name="numero_serie"
+          label="Número de Serie"
+          placeholder="Ej: CAT320D-001"
+          rules={[
+            { required: true, message: 'El número de serie es obligatorio' },
+          ]}
+        />
+        <ProFormText
+          name="motor"
+          label="Motor"
+          placeholder="Ej: Caterpillar C6.4"
         />
       </ModalForm>
     </PageContainer>
   );
 };
 
-export default IngresoPage;
+export default Ingreso;

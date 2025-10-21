@@ -18,7 +18,8 @@
     "antd": "^5.4.0",
     "dayjs": "^1.11.18",
     "html2canvas": "^1.4.1",
-    "jspdf": "^3.0.3"
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2"
   },
   "devDependencies": {
     "@types/react": "^18.0.33",
