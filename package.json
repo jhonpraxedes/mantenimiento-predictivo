@@ -1,6 +1,7 @@
 {
+  "name": "mantenimiento-predictivo",
   "private": true,
-  "author": "sam-pc-rw <samuel@rewardsweb.com>",
+  "author": "praxedes",
   "scripts": {
     "build": "max build",
     "dev": "max dev",
