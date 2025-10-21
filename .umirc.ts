@@ -41,6 +41,11 @@ export default defineConfig({
       path: '/usuarios',
       component: './Usuarios',
     },
+    {
+      name: 'Dashboard',
+      path: '/dashboard',
+      component: './Dashboard',
+    },
 
     { name: 'Reportes', path: '/reportes', component: './Reportes' },
   ],

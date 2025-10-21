@@ -1,151 +1,132 @@
-import services from '@/services/demo';
+import { ROLES_USUARIO, Usuario } from '@/constants/usuarios';
+import { UsuariosStore } from '@/services/usuariosLocal';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import type { ProColumns } from '@ant-design/pro-components';
 import {
-  ActionType,
-  FooterToolbar,
+  ModalForm,
   PageContainer,
-  ProColumns,
-  ProDescriptions,
+  ProFormSelect,
+  ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
-import { Button, Divider, Drawer, message } from 'antd';
-import React, { useRef, useState } from 'react';
-import CreateForm from './components/CreateForm';
-import UpdateForm, { FormValueType } from './components/UpdateForm';
+import { Button, message, Popconfirm, Space, Tag } from 'antd';
+import React, { useEffect, useState } from 'react';
 
-const { addUser, queryUserList, deleteUser, modifyUser } =
-  services.UserController;
+const Usuarios: React.FC = () => {
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-/**
- * Agregar usuario
- * @param fields
- */
-const handleAdd = async (fields: API.UserInfo) => {
-  const hide = message.loading('Agregando...');
-  try {
-    await addUser({ ...fields });
-    hide();
-    message.success('Agregado correctamente');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('No se pudo agregar. Intenta de nuevo.');
-    return false;
-  }
-};
+  const cargarDatos = async () => {
+    setLoading(true);
+    try {
+      const data = await UsuariosStore.list();
+      setUsuarios(data);
+    } catch (error) {
+      message.error('Error al cargar usuarios');
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    cargarDatos();
+  }, []);
+  const handleSubmit = async (values: any) => {
+    try {
+      if (editingId) {
+        await UsuariosStore.update(editingId, values);
+        message.success('Usuario actualizado correctamente');
+      } else {
+        await UsuariosStore.create(values);
+        message.success('Usuario creado correctamente');
+      }
+      setModalVisible(false);
+      setEditingId(null);
+      cargarDatos();
+      return true;
+    } catch (error: any) {
+      message.error(error.message || 'Error al guardar usuario');
+      return false;
+    }
+  };
 
-/**
- * Actualizar usuario
- * @param fields
- */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('Guardando cambios...');
-  try {
-    await modifyUser(
-      {
-        userId: fields.id || '',
-      },
-      {
-        name: fields.name || '',
-        nickName: fields.nickName || '',
-        email: fields.email || '',
-      },
-    );
-    hide();
+  const handleEdit = (record: Usuario) => {
+    setEditingId(record.id);
+    setModalVisible(true);
+  };
 
-    message.success('Cambios guardados');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('No se pudieron guardar los cambios. Intenta de nuevo.');
-    return false;
-  }
-};
+  const handleDelete = async (id: string) => {
+    try {
+      await UsuariosStore.delete(id);
+      message.success('Usuario eliminado correctamente');
+      cargarDatos();
+    } catch (error) {
+      message.error('Error al eliminar usuario');
+    }
+  };
 
-/**
- * Eliminar usuarios
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: API.UserInfo[]) => {
-  const hide = message.loading('Eliminando...');
-  if (!selectedRows) return true;
-  try {
-    await Promise.all(
-      selectedRows.map((row) =>
-        deleteUser({
-          userId: row.id || '',
-        }),
-      ),
-    );
-    hide();
-    message.success('Eliminado correctamente. Actualizando...');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('No se pudo eliminar. Intenta de nuevo.');
-    return false;
-  }
-};
-
-const TableList: React.FC<unknown> = () => {
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  const [updateModalVisible, handleUpdateModalVisible] =
-    useState<boolean>(false);
-  const [stepFormValues, setStepFormValues] = useState({});
-  const actionRef = useRef<ActionType>();
-  const [row, setRow] = useState<API.UserInfo>();
-  const [selectedRowsState, setSelectedRows] = useState<API.UserInfo[]>([]);
-
-  const columns: ProColumns<API.UserInfo>[] = [
+  const columns: ProColumns<Usuario>[] = [
+    {
+      title: 'Código',
+      dataIndex: 'code',
+      width: 120,
+      fixed: 'left',
+      sorter: (a, b) => a.code.localeCompare(b.code),
+    },
     {
       title: 'Nombre',
       dataIndex: 'name',
-      tip: 'El nombre es una clave única',
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: 'El nombre es obligatorio',
-          },
-        ],
+      width: 250,
+      sorter: (a, b) => a.name.localeCompare(b.name),
+    },
+    {
+      title: 'Rol',
+      dataIndex: 'rol',
+      width: 150,
+      filters: ROLES_USUARIO.map((rol) => ({ text: rol, value: rol })),
+      onFilter: (value, record) => record.rol === value,
+      render: (_, record) => {
+        const color = record.rol === 'Administrador' ? 'red' : 'blue';
+        return <Tag color={color}>{record.rol}</Tag>;
       },
     },
     {
-      title: 'Apodo',
-      dataIndex: 'nickName',
-      valueType: 'text',
-    },
-    {
-      title: 'Género',
-      dataIndex: 'gender',
-      hideInForm: true,
-      valueEnum: {
-        0: { text: 'Hombre', status: 'MALE' },
-        1: { text: 'Mujer', status: 'FEMALE' },
+      title: 'Fecha Creación',
+      dataIndex: 'created_at',
+      width: 180,
+      valueType: 'dateTime',
+      sorter: (a, b) => {
+        const dateA = new Date(a.created_at || 0).getTime();
+        const dateB = new Date(b.created_at || 0).getTime();
+        return dateA - dateB;
       },
     },
     {
       title: 'Acciones',
-      dataIndex: 'option',
-      valueType: 'option',
+      key: 'actions',
+      width: 150,
+      fixed: 'right',
       render: (_, record) => (
-        <>
-          <a
-            onClick={() => {
-              handleUpdateModalVisible(true);
-              setStepFormValues(record);
-            }}
+        <Space>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
           >
             Editar
-          </a>
-          <Divider type="vertical" />
-          <a
-            onClick={() => {
-              setRow(record);
-            }}
+          </Button>
+          <Popconfirm
+            title="¿Estás seguro de eliminar este usuario?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Sí"
+            cancelText="No"
           >
-            Ver detalles
-          </a>
-        </>
+            <Button type="link" danger icon={<DeleteOutlined />}>
+              Eliminar
+            </Button>
+          </Popconfirm>
+        </Space>
       ),
     },
   ];
@@ -153,129 +134,78 @@ const TableList: React.FC<unknown> = () => {
   return (
     <PageContainer
       header={{
-        title: 'Ejemplo CRUD',
+        title: 'Gestión de Usuarios',
+        subTitle: 'Administración de usuarios del sistema',
       }}
     >
-      <ProTable<API.UserInfo>
-        headerTitle="Tabla de consulta"
-        actionRef={actionRef}
+      <ProTable<Usuario>
+        columns={columns}
+        dataSource={usuarios}
         rowKey="id"
-        search={{
-          labelWidth: 120,
-        }}
+        loading={loading}
+        search={false}
+        dateFormatter="string"
+        scroll={{ x: 900 }}
         toolBarRender={() => [
           <Button
-            key="1"
+            key="button"
+            icon={<PlusOutlined />}
             type="primary"
-            onClick={() => handleModalVisible(true)}
+            onClick={() => {
+              setEditingId(null);
+              setModalVisible(true);
+            }}
           >
-            Nuevo
+            Nuevo Usuario
           </Button>,
         ]}
-        request={async (params, sorter, filter) => {
-          const { data, success } = await queryUserList({
-            ...params,
-            // FIXME: remove @ts-ignore
-            // @ts-ignore
-            sorter,
-            filter,
-          });
-          return {
-            data: data?.list || [],
-            success,
-          };
-        }}
-        columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => setSelectedRows(selectedRows),
-        }}
       />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              Seleccionados{' '}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              ítems&nbsp;&nbsp;
-            </div>
-          }
-        >
-          <Button
-            onClick={async () => {
-              await handleRemove(selectedRowsState);
-              setSelectedRows([]);
-              actionRef.current?.reloadAndRest?.();
-            }}
-          >
-            Eliminar seleccionados
-          </Button>
-          <Button type="primary">Aprobar seleccionados</Button>
-        </FooterToolbar>
-      )}
-      <CreateForm
-        onCancel={() => handleModalVisible(false)}
-        modalVisible={createModalVisible}
-      >
-        <ProTable<API.UserInfo, API.UserInfo>
-          onSubmit={async (value) => {
-            const success = await handleAdd(value);
-            if (success) {
-              handleModalVisible(false);
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
-            }
-          }}
-          rowKey="id"
-          type="form"
-          columns={columns}
-        />
-      </CreateForm>
-      {stepFormValues && Object.keys(stepFormValues).length ? (
-        <UpdateForm
-          onSubmit={async (value) => {
-            const success = await handleUpdate(value);
-            if (success) {
-              handleUpdateModalVisible(false);
-              setStepFormValues({});
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
-            }
-          }}
-          onCancel={() => {
-            handleUpdateModalVisible(false);
-            setStepFormValues({});
-          }}
-          updateModalVisible={updateModalVisible}
-          values={stepFormValues}
-        />
-      ) : null}
 
-      <Drawer
-        width={600}
-        open={!!row}
-        onClose={() => {
-          setRow(undefined);
+      <ModalForm
+        title={editingId ? 'Editar Usuario' : 'Nuevo Usuario'}
+        open={modalVisible}
+        onOpenChange={setModalVisible}
+        onFinish={handleSubmit}
+        width={500}
+        request={async () => {
+          if (editingId) {
+            const usuario = await UsuariosStore.get(editingId);
+            return usuario || {};
+          }
+          return {};
         }}
-        closable={false}
       >
-        {row?.name && (
-          <ProDescriptions<API.UserInfo>
-            column={2}
-            title={row?.name}
-            request={async () => ({
-              data: row || {},
-            })}
-            params={{
-              id: row?.name,
-            }}
-            columns={columns as any}
-          />
-        )}
-      </Drawer>
+        <ProFormText
+          name="code"
+          label="Código"
+          placeholder="Ej: ADM-001, OPR-001"
+          rules={[
+            { required: true, message: 'El código es requerido' },
+            {
+              pattern: /^[A-Z]{3}-\d{3}$/,
+              message: 'Formato: XXX-000 (Ej: ADM-001)',
+            },
+          ]}
+        />
+        <ProFormText
+          name="name"
+          label="Nombre Completo"
+          placeholder="Ingrese el nombre completo"
+          rules={[
+            { required: true, message: 'El nombre es requerido' },
+            { min: 3, message: 'El nombre debe tener al menos 3 caracteres' },
+          ]}
+        />
+        <ProFormSelect
+          name="rol"
+          label="Rol"
+          options={ROLES_USUARIO.map((rol) => ({ label: rol, value: rol }))}
+          rules={[{ required: true, message: 'El rol es requerido' }]}
+          placeholder="Seleccione un rol"
+        />
+      </ModalForm>
     </PageContainer>
   );
 };
 
-export default TableList;
+export default Usuarios;
