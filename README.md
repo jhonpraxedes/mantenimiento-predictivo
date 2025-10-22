@@ -13,3 +13,11 @@ python -m pipenv install
 python -m pipenv shell
 
 python -m gateway.main
+
+# mod reportes
+
+pnpm add jspdf jspdf-autotable
+
+# mod dashboard
+
+pnpm add recharts
