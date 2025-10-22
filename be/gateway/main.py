@@ -1,7 +1,6 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI 
 from fastapi.middleware.cors import CORSMiddleware
-from gateway.routers import auth, users, services
-from gateway.config import settings
+from gateway.routers import users, services
 
 app = FastAPI(
     title="API Gateway",
@@ -19,9 +18,8 @@ app.add_middleware(
 )
 
 # Routers
-app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
-app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
-app.include_router(services.router, prefix="/api/v1/services", tags=["services"])
+app.include_router(users.router, prefix="/api/users", tags=["users"])
+app.include_router(services.router, prefix="/api/services", tags=["services"])
 
 @app.get("/")
 async def root():

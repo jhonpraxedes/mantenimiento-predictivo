@@ -4,17 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-sqlalchemy = "*"
-python-jose = {extras = ["cryptography"], version = "*"}
-passlib = {extras = ["bcrypt"], version = "*"}
 fastapi = "*"
 uvicorn = "*"
 pydantic = "*"
-python-dotenv = "*"
 httpx = "*"
 scikit-learn = "*"
 pandas = "*"
 numpy = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
+sqlalchemy = ">=2.0"
+psycopg2-binary = "*"
+python-dotenv = "*"
+alembic = "*"
 
 [dev-packages]
 pytest = "*"
