@@ -17,19 +17,16 @@ export default defineConfig({
   },
   routes: [
     {
-      path: '/',
-      redirect: '/maquinaria',
+      path: '/login',
+      name: 'Login',
+      component: '@/pages/Login',
     },
     {
-      name: 'Maquinaria',
-      path: '/maquinaria',
-      component: './Maquinaria',
+      name: 'Inicio',
+      path: '/inicio',
+      component: './Inicio',
     },
-    {
-      name: 'Control Maquinaria',
-      path: '/control-maquinaria',
-      component: './ControlMaquinaria',
-    },
+
     {
       name: 'Ingreso',
       path: '/ingreso',
@@ -40,14 +37,22 @@ export default defineConfig({
       name: 'Usuarios',
       path: '/usuarios',
       component: './Usuarios',
+      access: 'canSeeAdmin',
     },
     {
       name: 'Dashboard',
       path: '/dashboard',
       component: './Dashboard',
+      access: 'isLoggedIn',
     },
 
-    { name: 'Reportes', path: '/reportes', component: './Reportes' },
+    {
+      name: 'Reportes',
+      path: '/reportes',
+      component: './Reportes',
+      access: 'isLoggedIn',
+    },
+    { path: '/', redirect: '/inicio' },
   ],
   npmClient: 'pnpm',
 });

@@ -1,10 +1,19 @@
-export default (initialState: API.UserInfo) => {
-  // 在这里按照初始化数据定义项目中的权限，统一管理
-  // 参考文档 https://umijs.org/docs/max/access
-  const canSeeAdmin = !!(
-    initialState && initialState.name !== 'dontHaveAccess'
-  );
+type Rol = 'Administrador' | 'Operador';
+
+export default function access(initialState: any) {
+  const rol = initialState?.currentUser?.rol as Rol | undefined;
+
   return {
-    canSeeAdmin,
+    // Sesión iniciada
+    isLoggedIn: !!rol,
+
+    // Solo administradores
+    canAdmin: rol === 'Administrador',
+
+    // Operadores y administradores
+    canOperator: rol === 'Operador' || rol === 'Administrador',
+
+    // Compatibilidad con rutas antiguas que usaban canSeeAdmin
+    canSeeAdmin: rol === 'Administrador',
   };
-};
+}
