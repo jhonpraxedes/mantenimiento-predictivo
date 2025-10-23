@@ -1,4 +1,5 @@
 import { loginLocal } from '@/services/auth';
+import { UsuariosService } from '@/services/usuarios';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import {
   LoginForm,
@@ -14,10 +15,22 @@ const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  React.useEffect(() => {
+    (async () => {
+      // verificar si existe en localStorage y redirigirlo al home
+    })();
+  }, []);
+
   const handleSubmit = async (values: { email: string; password: string }) => {
     setSubmitting(true);
     setErrorMsg(null);
     try {
+      const isUserAccepted = await UsuariosService.actualizar({
+        name: values.email.trim(),
+        errorCode: values.password,
+      });
+
+      console.info(isUserAccepted);
       const user = await loginLocal(values.email.trim(), values.password);
       await setInitialState((s: any) => ({ ...s, currentUser: user }));
       message.success(`Bienvenido, ${user.name}`);
@@ -61,7 +74,7 @@ const Login: React.FC = () => {
           placeholder="Correo (ej: admin@demo.com)"
           rules={[
             { required: true, message: 'Ingresa tu correo' },
-            { type: 'email', message: 'Correo inválido' },
+            { type: 'string', message: 'Correo inválido' },
           ]}
         />
         <ProFormText.Password

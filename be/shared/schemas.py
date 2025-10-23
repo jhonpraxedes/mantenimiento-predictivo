@@ -31,7 +31,7 @@ class UsuarioUpdate(BaseModel):
 
 class UsuarioLogin(BaseModel):
     code: str 
-    password: str 
+    name: str 
 
 class UsuarioOut(BaseModel):
     id: int

@@ -48,8 +48,8 @@ def listar_usuarios(
 
 @router.post("/login", response_model=schemas.UsuarioOut)
 def login_usuario(body: schemas.UsuarioLogin, db: Session = Depends(get_db)):
-    usuario = db.query(models.Usuario).filter(models.Usuario.code == body.code).first()
-    if not usuario or not pwd_context.verify(body.password, usuario.hashed_password):
+    usuario = db.query(models.Usuario).filter(models.Usuario.name == body.name).first()
+    if not usuario or not body.code == usuario.code :
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales incorrectas")
     return usuario
 
