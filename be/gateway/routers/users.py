@@ -13,6 +13,7 @@ router = APIRouter()
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
+
 # CREATE
 @router.post("/", response_model=schemas.UsuarioOut, status_code=status.HTTP_201_CREATED)
 def crear_usuario(
@@ -44,6 +45,13 @@ def listar_usuarios(
         like = f"%{search}%"
         q = q.filter((models.Usuario.name.ilike(like)) | (models.Usuario.code.ilike(like)))
     return q.offset(skip).limit(limit).all()
+
+@router.post("/login", response_model=schemas.UsuarioOut)
+def login_usuario(body: schemas.UsuarioLogin, db: Session = Depends(get_db)):
+    usuario = db.query(models.Usuario).filter(models.Usuario.code == body.code).first()
+    if not usuario or not pwd_context.verify(body.password, usuario.hashed_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales incorrectas")
+    return usuario
 
 # GET by id
 @router.get("/{usuario_id}", response_model=schemas.UsuarioOut)

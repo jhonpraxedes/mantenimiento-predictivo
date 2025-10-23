@@ -1,6 +1,6 @@
 from fastapi import FastAPI 
 from fastapi.middleware.cors import CORSMiddleware
-from gateway.routers import users, services
+from gateway.routers import users, services, maquinaria, lecturas
 
 app = FastAPI(
     title="API Gateway",
@@ -19,6 +19,8 @@ app.add_middleware(
 
 # Routers
 app.include_router(users.router, prefix="/api/users", tags=["users"])
+app.include_router(maquinaria.router, prefix="/api/maquinas", tags=["maquinas"])
+app.include_router(lecturas.router, prefix="/api/lecturas", tags=["lecturas"])
 app.include_router(services.router, prefix="/api/services", tags=["services"])
 
 @app.get("/")
