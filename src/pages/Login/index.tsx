@@ -25,9 +25,9 @@ const Login: React.FC = () => {
     setSubmitting(true);
     setErrorMsg(null);
     try {
-      const isUserAccepted = await UsuariosService.actualizar({
+      const isUserAccepted = await UsuariosService.authenticateUser({
         name: values.email.trim(),
-        errorCode: values.password,
+        code: values.password,
       });
 
       console.info(isUserAccepted);

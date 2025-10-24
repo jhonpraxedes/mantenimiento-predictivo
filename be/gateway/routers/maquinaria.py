@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from typing import List, Optional
+import random
 
 from shared.db import get_db
 from shared import models, schemas
@@ -20,11 +21,90 @@ def crear_maquina(
     if exists:
         raise HTTPException(status_code=400, detail="El número de serie ya existe")
 
-    m = models.Maquina(**body.model_dump())
+    data = body.model_dump(exclude_unset=True)
+    if data.get("status") is None:
+        data["status"] = random.choice(["OK", "Alerta", "Crítico"])
+
+    m = models.Maquina(**data)
     db.add(m)
     db.commit()
     db.refresh(m)
     return m
+
+# gateway/routers/lecturas.py
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from sqlalchemy import select, desc
+from typing import List, Optional
+from datetime import datetime
+
+from shared.db import get_db
+from shared import models, schemas
+from prediction.services.predictions import PredictionService
+
+router = APIRouter()
+
+@router.post("/maquina/{maquina_id}/info", response_model=schemas.LecturaOut, status_code=status.HTTP_201_CREATED)
+def maquina_info(
+    maquina_id: int,
+    db: Session = Depends(get_db),
+):
+    maquina = db.get(models.Maquina, maquina_id)
+    if not maquina:
+        raise HTTPException(status_code=404, detail="Máquina no encontrada")
+    
+    # 2) Buscar la última lectura de esta máquina para obtener timestamp_arranque
+    stmt = (
+        select(models.LecturaMaquina)
+        .where(models.LecturaMaquina.maquina_id == maquina_id)
+        .order_by(desc(models.LecturaMaquina.timestamp_lectura))
+        .limit(1)
+    )
+    ultima_lectura = db.execute(stmt).scalars().first()
+    
+    # Si existe lectura previa, reutilizar su timestamp_arranque
+    timestamp_arranque = ultima_lectura.timestamp_arranque if ultima_lectura else None
+    
+    # 3) Generar lectura basada en el status
+    prediction_service = PredictionService()
+    datos_lectura = prediction_service.predict(status=maquina.status, timestamp_arranque=timestamp_arranque)
+    
+    # 4) Crear y guardar la lectura
+    lectura = models.LecturaMaquina(
+        maquina_id=maquina_id,
+        **datos_lectura
+    )
+    db.add(lectura)
+    db.commit()
+    db.refresh(lectura)
+    
+    # 5) Retornar la lectura al frontend
+    return lectura
+
+
+@router.post("/maquina/{maquina_id}/reiniciar", response_model=schemas.LecturaOut, status_code=status.HTTP_201_CREATED)
+def reiniciar_maquina(
+    maquina_id: int,
+    db: Session = Depends(get_db),
+):
+    maquina = db.get(models.Maquina, maquina_id)
+    if not maquina:
+        raise HTTPException(status_code=404, detail="Máquina no encontrada")
+    
+    # Forzar timestamp_arranque=None para generar uno nuevo
+    prediction_service = PredictionService()
+    datos_lectura = prediction_service.predict(status=maquina.status, timestamp_arranque=None)
+
+    
+    lectura = models.LecturaMaquina(
+        maquina_id=maquina_id,
+        **datos_lectura
+    )
+    db.add(lectura)
+    db.commit()
+    db.refresh(lectura)
+    
+    return lectura
 
 @router.get("/", response_model=List[schemas.MaquinaOut])
 def listar_maquinas(

@@ -48,9 +48,10 @@ class MaquinaBase(BaseModel):
     descripcion: Optional[str] = None
     numero_serie: str = Field(..., min_length=1, max_length=200)
     motor: Optional[str] = None
+    status: Optional[Literal["OK", "Alerta", "Crítico"]] = None
 
 class MaquinaCreate(MaquinaBase):
-    pass
+    status: Optional[Literal["OK", "Alerta", "Crítico"]] = None
 
 class MaquinaUpdate(BaseModel):
     nombre: Optional[str] = Field(None, min_length=1, max_length=200)

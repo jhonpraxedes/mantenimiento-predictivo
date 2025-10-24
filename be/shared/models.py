@@ -19,6 +19,7 @@ class Maquina(Base):
     descripcion = Column(String)
     numero_serie = Column(String, unique=True, index=True, nullable=False)
     motor = Column(String)
+    status = Column(String, nullable=False, default="OK")
 
     lecturas = relationship("LecturaMaquina", back_populates="maquina", cascade="all, delete-orphan")
 
