@@ -1,100 +1,52 @@
-import { loginLocal } from '@/services/auth';
-import { UsuariosService } from '@/services/usuarios';
-import { LockOutlined, MailOutlined } from '@ant-design/icons';
-import {
-  LoginForm,
-  ProFormCheckbox,
-  ProFormText,
-} from '@ant-design/pro-components';
-import { history, useModel } from '@umijs/max';
-import { Alert, message } from 'antd';
-import React, { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import type { ProFormInstance } from '@ant-design/pro-components';
+import { LoginForm, ProFormText } from '@ant-design/pro-components';
+import { message } from 'antd';
+import { useRef } from 'react';
+import { useNavigate } from 'umi';
 
-const Login: React.FC = () => {
-  const { setInitialState } = useModel('@@initialState');
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+export default () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const formRef = useRef<ProFormInstance>(null);
 
-  React.useEffect(() => {
-    (async () => {
-      // verificar si existe en localStorage y redirigirlo al home
-    })();
-  }, []);
-
-  const handleSubmit = async (values: { email: string; password: string }) => {
-    setSubmitting(true);
-    setErrorMsg(null);
-    try {
-      const isUserAccepted = await UsuariosService.actualizar({
-        name: values.email.trim(),
-        errorCode: values.password,
-      });
-
-      console.info(isUserAccepted);
-      const user = await loginLocal(values.email.trim(), values.password);
-      await setInitialState((s: any) => ({ ...s, currentUser: user }));
-      message.success(`Bienvenido, ${user.name}`);
-      history.push('/dashboard');
-    } catch (e: any) {
-      setErrorMsg(e?.message || 'Error de autenticación');
-    } finally {
-      setSubmitting(false);
+  const handleSubmit = async (values: { name: string; code: string }) => {
+    const success = await login(values);
+    if (success) {
+      message.success('Inicio de sesión exitoso');
+      navigate('/dashboard');
     }
   };
 
   return (
     <div
       style={{
-        minHeight: '100vh',
-        display: 'grid',
-        placeItems: 'center',
-        padding: 16,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
       }}
     >
       <LoginForm
+        formRef={formRef}
+        title="Mant. Predictivo"
+        subTitle="Inicia sesión para continuar"
         onFinish={handleSubmit}
-        submitter={{
-          searchConfig: { submitText: 'Ingresar' },
-          submitButtonProps: { loading: submitting },
-        }}
-        title="Sistema de Mantenimiento Predictivo"
-        subTitle="Empresas de maquinaria pesada en Guatemala"
       >
-        {errorMsg && (
-          <Alert
-            type="error"
-            showIcon
-            style={{ marginBottom: 16 }}
-            message={errorMsg}
-          />
-        )}
         <ProFormText
-          name="email"
-          fieldProps={{ size: 'large', prefix: <MailOutlined /> }}
-          placeholder="Correo (ej: admin@demo.com)"
-          rules={[
-            { required: true, message: 'Ingresa tu correo' },
-            { type: 'string', message: 'Correo inválido' },
-          ]}
+          name="name"
+          fieldProps={{ size: 'large', prefix: <UserOutlined /> }}
+          placeholder="Nombre de usuario"
+          rules={[{ required: true, message: 'Por favor ingresa tu nombre' }]}
         />
-        <ProFormText.Password
-          name="password"
+        <ProFormText
+          name="code"
           fieldProps={{ size: 'large', prefix: <LockOutlined /> }}
-          placeholder="Contraseña (ej: 123456)"
-          rules={[{ required: true, message: 'Ingresa tu contraseña' }]}
+          placeholder="Código"
+          rules={[{ required: true, message: 'Por favor ingresa tu código' }]}
         />
-        <div style={{ marginBlockEnd: 12 }}>
-          <ProFormCheckbox noStyle name="autoLogin">
-            Recordarme
-          </ProFormCheckbox>
-        </div>
-        <div style={{ color: '#999' }}>
-          Demo: admin@demo.com / 123456 (Administrador) • user@demo.com / 123456
-          (Operador)
-        </div>
       </LoginForm>
     </div>
   );
 };
-
-export default Login;

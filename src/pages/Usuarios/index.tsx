@@ -1,5 +1,5 @@
 import { ROLES_USUARIO, Usuario } from '@/constants/usuarios';
-import { UsuariosStore } from '@/services/usuariosLocal';
+import { UsuariosService } from '@/services/usuarios';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-components';
 import {
@@ -16,29 +16,31 @@ const Usuarios: React.FC = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const cargarDatos = async () => {
     setLoading(true);
     try {
-      const data = await UsuariosStore.list();
-      setUsuarios(data);
+      const data = await UsuariosService.listUsers();
+      setUsuarios(data as Usuario[]);
     } catch (error) {
       message.error('Error al cargar usuarios');
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     cargarDatos();
   }, []);
+
   const handleSubmit = async (values: any) => {
     try {
       if (editingId) {
-        await UsuariosStore.update(editingId, values);
+        await UsuariosService.updateUser(editingId, values);
         message.success('Usuario actualizado correctamente');
       } else {
-        await UsuariosStore.create(values);
+        await UsuariosService.createUser(values);
         message.success('Usuario creado correctamente');
       }
       setModalVisible(false);
@@ -56,9 +58,9 @@ const Usuarios: React.FC = () => {
     setModalVisible(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     try {
-      await UsuariosStore.delete(id);
+      await UsuariosService.deleteUser(id);
       message.success('Usuario eliminado correctamente');
       cargarDatos();
     } catch (error) {
@@ -87,7 +89,7 @@ const Usuarios: React.FC = () => {
       filters: ROLES_USUARIO.map((rol) => ({ text: rol, value: rol })),
       onFilter: (value, record) => record.rol === value,
       render: (_, record) => {
-        const color = record.rol === 'Administrador' ? 'red' : 'blue';
+        const color = record.rol === 'ADMINISTRADOR' ? 'red' : 'blue';
         return <Tag color={color}>{record.rol}</Tag>;
       },
     },
@@ -169,7 +171,7 @@ const Usuarios: React.FC = () => {
         width={500}
         request={async () => {
           if (editingId) {
-            const usuario = await UsuariosStore.get(editingId);
+            const usuario = await UsuariosService.getUserById(editingId);
             return usuario || {};
           }
           return {};
