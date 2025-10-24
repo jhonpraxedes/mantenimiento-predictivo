@@ -1,38 +1,68 @@
 import { apiJson } from './api';
 
 export const UsuariosService = {
+  // Login de usuario
   authenticateUser: async (credentials: { name: string; code: string }) => {
-    return await apiJson({
+    return await apiJson<{
+      id: number;
+      name: string;
+      code: string;
+      role: string;
+    }>({
       path: '/users/login',
       method: 'POST',
       body: credentials,
     });
   },
-  create: async (user: { code: string; name: string; role: string }) => {
+
+  // Crear usuario
+  createUser: async (user: { code: string; name: string; role: string }) => {
     return await apiJson({
       path: '/users',
       method: 'POST',
       body: user,
     });
   },
-  getUserById: async (id: any) => {
-    // Implementation for fetching a user by ID
-    console.info(id);
-    return;
+
+  // Listar usuarios con filtros
+  listUsers: async (params?: {
+    skip?: number;
+    limit?: number;
+    role?: string;
+    search?: string;
+  }) => {
+    return await apiJson({
+      path: '/users',
+      method: 'GET',
+      query: params,
+    });
   },
-  createUser: async (user: any) => {
-    // Implementation for creating a new user
-    console.info(user);
-    return;
+
+  // Obtener usuario por ID
+  getUserById: async (id: number) => {
+    return await apiJson({
+      path: `/users/${id}`,
+      method: 'GET',
+    });
   },
-  updateUser: async (id: any, user: any) => {
-    // Implementation for updating an existing user
-    console.info(user);
-    return;
+
+  // Actualizar usuario (PATCH)
+  updateUser: async (
+    id: number,
+    updates: Partial<{ name: string; code: string; role: string }>,
+  ) => {
+    return await apiJson({
+      path: `/users/${id}`,
+      method: 'PATCH',
+      body: updates,
+    });
   },
-  deleteUser: async (id: any) => {
-    // Implementation for deleting a user by ID
-    console.info(id);
-    return;
+
+  // Eliminar usuario
+  deleteUser: async (id: number) => {
+    return await apiJson({
+      path: `/users/${id}`,
+      method: 'DELETE',
+    });
   },
 };
