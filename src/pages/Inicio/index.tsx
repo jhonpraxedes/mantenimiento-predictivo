@@ -77,7 +77,7 @@ const Home: React.FC = () => {
                 <Paragraph type="secondary">
                   Sesión iniciada como:{' '}
                   <Text strong>
-                    {user.name} ({user.rol})
+                    {user.name} ({user.role})
                   </Text>
                 </Paragraph>
               </>

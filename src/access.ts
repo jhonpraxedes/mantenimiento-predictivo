@@ -1,19 +1,19 @@
 type Rol = 'Administrador' | 'Operador';
 
 export default function access(initialState: any) {
-  const rol = initialState?.currentUser?.rol as Rol | undefined;
+  const role = initialState?.currentUser?.role as Rol | undefined;
 
   return {
     // Sesión iniciada
-    isLoggedIn: !!rol,
+    isLoggedIn: !!role,
 
     // Solo administradores
-    canAdmin: rol === 'Administrador',
+    canAdmin: role === 'Administrador',
 
     // Operadores y administradores
-    canOperator: rol === 'Operador' || rol === 'Administrador',
+    canOperator: role === 'Operador' || role === 'Administrador',
 
     // Compatibilidad con rutas antiguas que usaban canSeeAdmin
-    canSeeAdmin: rol === 'Administrador',
+    canSeeAdmin: role === 'Administrador',
   };
 }

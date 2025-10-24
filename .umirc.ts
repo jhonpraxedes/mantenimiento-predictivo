@@ -1,13 +1,15 @@
+// .umirc.ts
 import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
+  npmClient: 'pnpm',
   proxy: {
     '/api': {
-      target: 'http://localhost:8001',
+      target: 'http://127.0.0.1:8001', // <- apunta al backend
       changeOrigin: true,
+      pathRewrite: { '^/api': '/api' },
     },
   },
-
   antd: {},
   access: {},
   model: {},
@@ -16,50 +18,38 @@ export default defineConfig({
   locale: {
     default: 'es-ES',
     antd: true,
-    baseSeparator: '-',
+    // baseSeparator: '-', // opcional, puedes probar sin esta línea
   },
   layout: {
     title: 'Mantenimiento Predictivo',
-    locale: true,
   },
   routes: [
+    { path: '/login', name: 'Login', component: '@/pages/Login' },
+    { path: '/inicio', name: 'Inicio', component: './Inicio' },
     {
-      path: '/login',
-      name: 'Login',
-      component: '@/pages/Login',
-    },
-    {
-      name: 'Inicio',
-      path: '/inicio',
-      component: './Inicio',
-    },
-
-    {
-      name: 'Ingreso',
       path: '/ingreso',
+      name: 'Ingreso',
       component: './Ingreso',
-      access: 'canSeeAdmin', // Solo admin
-    },
-    {
-      name: 'Usuarios',
-      path: '/usuarios',
-      component: './Usuarios',
       access: 'canSeeAdmin',
     },
     {
-      name: 'Dashboard',
-      path: '/dashboard',
-      component: './Dashboard',
-      access: 'isLoggedIn',
+      path: '/usuarios',
+      name: 'Usuarios',
+      component: './Usuarios',
+      access: 'canseeAdmin', // Solo admin
     },
-
     {
-      name: 'Reportes',
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: './Dashboard',
+      access: 'isLoggedin',
+    },
+    {
       path: '/reportes',
+      name: 'Reportes',
       component: './Reportes',
       access: 'isLoggedIn',
     },
     { path: '/', redirect: '/inicio' },
   ],
-  npmClient: 'pnpm',
 });

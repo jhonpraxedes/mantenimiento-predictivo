@@ -38,7 +38,7 @@ export const layout: RunTimeLayoutConfig = ({
         {/* Derecha: usuario + botón logout */}
         <Space style={{ marginRight: 16 }}>
           <Tag color="blue">
-            {user.name} · {user.rol}
+            {user.name} · {user.role}
           </Tag>
           <Button
             size="small"

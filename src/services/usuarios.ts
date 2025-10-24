@@ -1,68 +1,35 @@
-import { apiJson } from './api';
+// src/services/usuarios.ts
+import { apiJson } from '@/services/api';
 
 export const UsuariosService = {
-  // Login de usuario
   authenticateUser: async (credentials: { name: string; code: string }) => {
-    return await apiJson<{
+    return apiJson<{
       id: number;
       name: string;
       code: string;
       role: string;
     }>({
-      path: '/users/login',
+      path: 'users/login', // sin slash inicial: usará '/api/users/login' con BASE_URL = '/api'
       method: 'POST',
       body: credentials,
     });
   },
 
-  // Crear usuario
-  createUser: async (user: { code: string; name: string; role: string }) => {
-    return await apiJson({
-      path: '/users',
-      method: 'POST',
-      body: user,
-    });
-  },
+  listUsers: async () =>
+    apiJson({
+      path: 'users',
+    }),
 
-  // Listar usuarios con filtros
-  listUsers: async (params?: {
-    skip?: number;
-    limit?: number;
-    role?: string;
-    search?: string;
-  }) => {
-    return await apiJson({
-      path: '/users',
-      method: 'GET',
-      query: params,
-    });
-  },
+  // Otros métodos ejemplo:
+  getUserById: async (id: number) =>
+    apiJson({ path: `users/${id}`, method: 'GET' }),
 
-  // Obtener usuario por ID
-  getUserById: async (id: number) => {
-    return await apiJson({
-      path: `/users/${id}`,
-      method: 'GET',
-    });
-  },
+  createUser: async (payload: any) =>
+    apiJson({ path: 'users', method: 'POST', body: payload }),
 
-  // Actualizar usuario (PATCH)
-  updateUser: async (
-    id: number,
-    updates: Partial<{ name: string; code: string; role: string }>,
-  ) => {
-    return await apiJson({
-      path: `/users/${id}`,
-      method: 'PATCH',
-      body: updates,
-    });
-  },
+  updateUser: async (id: number, payload: any) =>
+    apiJson({ path: `users/${id}`, method: 'PATCH', body: payload }),
 
-  // Eliminar usuario
-  deleteUser: async (id: number) => {
-    return await apiJson({
-      path: `/users/${id}`,
-      method: 'DELETE',
-    });
-  },
+  deleteUser: async (id: number) =>
+    apiJson({ path: `users/${id}`, method: 'DELETE' }),
 };

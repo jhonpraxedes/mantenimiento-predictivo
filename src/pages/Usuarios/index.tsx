@@ -84,13 +84,13 @@ const Usuarios: React.FC = () => {
     },
     {
       title: 'Rol',
-      dataIndex: 'rol',
+      dataIndex: 'role',
       width: 150,
-      filters: ROLES_USUARIO.map((rol) => ({ text: rol, value: rol })),
-      onFilter: (value, record) => record.rol === value,
+      filters: ROLES_USUARIO.map((role) => ({ text: role, value: role })),
+      onFilter: (value, record) => record.role === value,
       render: (_, record) => {
-        const color = record.rol === 'ADMINISTRADOR' ? 'red' : 'blue';
-        return <Tag color={color}>{record.rol}</Tag>;
+        const color = record.role === 'ADMINISTRADOR' ? 'red' : 'blue';
+        return <Tag color={color}>{record.role}</Tag>;
       },
     },
     {
@@ -199,11 +199,11 @@ const Usuarios: React.FC = () => {
           ]}
         />
         <ProFormSelect
-          name="rol"
+          name="role"
           label="Rol"
-          options={ROLES_USUARIO.map((rol) => ({ label: rol, value: rol }))}
-          rules={[{ required: true, message: 'El rol es requerido' }]}
-          placeholder="Seleccione un rol"
+          options={ROLES_USUARIO.map((role) => ({ label: role, value: role }))}
+          rules={[{ required: true, message: 'El role es requerido' }]}
+          placeholder="Seleccione un role"
         />
       </ModalForm>
     </PageContainer>

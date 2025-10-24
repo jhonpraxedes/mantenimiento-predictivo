@@ -8,7 +8,7 @@ pnpm start
 
 # BE
 
-python -m pipenv install
+python -m pipenv install --system --deploy
 
 python -m pipenv shell
 

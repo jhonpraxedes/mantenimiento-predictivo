@@ -4,7 +4,7 @@ export interface UserSession {
   id: string;
   name: string;
   email: string;
-  rol: Rol;
+  role: Rol;
   token?: string;
 }
 
@@ -23,7 +23,7 @@ export async function loginLocal(
       id: '1',
       name: 'Admin',
       email,
-      rol: 'Administrador',
+      role: 'Administrador',
       token: 'demo-admin',
     };
     localStorage.setItem(LS_KEY, JSON.stringify(u));
@@ -34,7 +34,7 @@ export async function loginLocal(
       id: '2',
       name: 'Operador',
       email,
-      rol: 'Operador',
+      role: 'Operador',
       token: 'demo-user',
     };
     localStorage.setItem(LS_KEY, JSON.stringify(u));

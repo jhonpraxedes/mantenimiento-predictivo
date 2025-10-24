@@ -7,30 +7,30 @@ export interface Usuario {
   id: number;
   name: string;
   code: string;
-  rol: 'OPERADOR' | 'ADMINISTRADOR';
+  role: 'OPERADOR' | 'ADMINISTRADOR';
   created_at?: string;
 }
 // Datos iniciales de ejemplo
 export const USUARIOS_INICIALES: Usuario[] = [
   {
     id: 1,
-    name: 'Juan Pérez',
+    name: 'JUAN',
     code: 'ADM001',
-    rol: 'ADMINISTRADOR',
+    role: 'ADMINISTRADOR',
     created_at: '2024-01-15T10:00:00Z',
   },
   {
     id: 2,
     name: 'María González',
     code: 'OPR002',
-    rol: 'OPERADOR',
+    role: 'OPERADOR',
     created_at: '2024-02-20T10:00:00Z',
   },
   {
     id: 3,
     name: 'Carlos Ramirez',
     code: 'OPR002',
-    rol: 'OPERADOR',
+    role: 'OPERADOR',
     created_at: '2024-03-10T10:00:00Z',
   },
 ];

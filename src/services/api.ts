@@ -1,8 +1,7 @@
 // src/services/api.ts
-
-const BASE_URL = 'http://0.0.0.0:8001'; // ajusta si usas proxy o envs
-
 type Query = Record<string, string | number | boolean | null | undefined>;
+
+const BASE_URL = '/api'; // usar proxy del dev server
 
 function buildURL(path: string, query?: Query) {
   const clean = path.replace(/^\/+/, '');
@@ -19,7 +18,7 @@ function buildURL(path: string, query?: Query) {
 }
 
 export async function apiJson<T = unknown, B = unknown>(opts: {
-  path: string; // ej: 'status' -> BASE_URL/status
+  path: string;
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   query?: Query;
   body?: B;
@@ -45,14 +44,12 @@ export async function apiJson<T = unknown, B = unknown>(opts: {
 
   const res = await fetch(url, init);
 
-  // Manejo básico de errores HTTP
   if (!res.ok) {
-    // Intentar leer JSON de error
     let errorPayload: any = null;
     try {
       errorPayload = await res.json();
     } catch {
-      // ignorar, no es JSON
+      // ignore
     }
     const message =
       (errorPayload && (errorPayload.message || errorPayload.error)) ||
