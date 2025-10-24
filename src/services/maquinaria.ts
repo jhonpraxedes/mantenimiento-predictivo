@@ -1,58 +1,36 @@
-// src/services/maquinas.ts
-import { apiJson } from './api';
+// src/services/maquinaria.ts
+import type { Maquina, MaquinaCreate, MaquinaUpdate } from './maquinas';
+import { MaquinasService } from './maquinas';
 
-export type Maquina = {
-  id: number;
-  nombre: string;
-  descripcion?: string;
-  numero_serie: string;
-  motor?: string;
-};
-
-export type MaquinaCreate = Omit<Maquina, 'id'>;
-export type MaquinaUpdate = Partial<Omit<Maquina, 'id'>>;
-
-export const MaquinasService = {
-  // Crear máquina
-  create: async (data: MaquinaCreate) => {
-    return await apiJson<Maquina>({
-      path: '/maquinas',
-      method: 'POST',
-      body: data,
-    });
+// Adaptador para mantener la API que tu componente Ingreso ya consume
+export const MaquinariaStore = {
+  list: async (params?: {
+    skip?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<Maquina[]> => {
+    return MaquinasService.list(params);
   },
 
-  // Listar máquinas (con filtros)
-  list: async (params?: { skip?: number; limit?: number; search?: string }) => {
-    return await apiJson<Maquina[]>({
-      path: '/maquinas',
-      method: 'GET',
-      query: params,
-    });
+  create: async (data: MaquinaCreate): Promise<Maquina> => {
+    return MaquinasService.create(data);
   },
 
-  // Obtener máquina por ID
-  getById: async (id: number) => {
-    return await apiJson<Maquina>({
-      path: `/maquinas/${id}`,
-      method: 'GET',
-    });
+  get: async (id: number | string): Promise<Maquina> => {
+    const nid = typeof id === 'string' ? parseInt(id, 10) : id;
+    return MaquinasService.getById(nid);
   },
 
-  // Actualizar máquina
-  update: async (id: number, data: MaquinaUpdate) => {
-    return await apiJson<Maquina>({
-      path: `/maquinas/${id}`,
-      method: 'PATCH',
-      body: data,
-    });
+  update: async (
+    id: number | string,
+    data: MaquinaUpdate,
+  ): Promise<Maquina> => {
+    const nid = typeof id === 'string' ? parseInt(id, 10) : id;
+    return MaquinasService.update(nid, data);
   },
 
-  // Eliminar máquina
-  delete: async (id: number) => {
-    return await apiJson<void>({
-      path: `/maquinas/${id}`,
-      method: 'DELETE',
-    });
+  delete: async (id: number | string): Promise<void> => {
+    const nid = typeof id === 'string' ? parseInt(id, 10) : id;
+    return MaquinasService.delete(nid);
   },
 };

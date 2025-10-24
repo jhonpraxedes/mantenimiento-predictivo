@@ -1,5 +1,6 @@
+// src/pages/Ingreso.tsx  (o la ruta donde tengas el componente)
 import { Maquinaria, TIPOS_MAQUINARIA } from '@/constants/maquinaria';
-import { MaquinariaStore } from '@/services/maquinariaLocal';
+import { MaquinariaStore } from '@/services/maquinaria';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-components';
 import {
@@ -17,14 +18,15 @@ const Ingreso: React.FC = () => {
   const [maquinas, setMaquinas] = useState<Maquinaria[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const cargarDatos = async () => {
     setLoading(true);
     try {
       const data = await MaquinariaStore.list();
       setMaquinas(data);
-    } catch {
+    } catch (err: any) {
+      console.error(err);
       message.error('Error al cargar maquinaria');
     } finally {
       setLoading(false);
@@ -49,6 +51,7 @@ const Ingreso: React.FC = () => {
       cargarDatos();
       return true;
     } catch (error: any) {
+      console.error(error);
       message.error(error.message || 'Error al guardar');
       return false;
     }
@@ -59,12 +62,13 @@ const Ingreso: React.FC = () => {
     setModalVisible(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     try {
       await MaquinariaStore.delete(id);
       message.success('Eliminado correctamente');
       cargarDatos();
-    } catch {
+    } catch (err: any) {
+      console.error(err);
       message.error('Error al eliminar maquinaria');
     }
   };

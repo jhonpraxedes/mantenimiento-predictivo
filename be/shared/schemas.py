@@ -88,3 +88,26 @@ class LecturaOut(LecturaBase):
 # Maquina detallada con lecturas (opcional)
 class MaquinaWithLecturas(MaquinaOut):
     lecturas: List[LecturaOut] = []
+
+class LecturaAggregate(BaseModel):
+    maquina_id: Optional[int] = None
+    count: int
+    avg_temperatura: Optional[float] = None
+    min_temperatura: Optional[float] = None
+    max_temperatura: Optional[float] = None
+    avg_vibracion: Optional[float] = None
+    avg_presion: Optional[float] = None
+    avg_rpm_motor: Optional[float] = None
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+
+class MaquinasSummaryItem(BaseModel):
+    tipo: Optional[str] = None
+    status: Optional[str] = None
+    count: int
+
+class MaquinasSummaryResponse(BaseModel):
+    total: int
+    by_status: Dict[str, int] = {}
+    by_tipo: Dict[str, int] = {}
+    items: List[MaquinasSummaryItem] = []

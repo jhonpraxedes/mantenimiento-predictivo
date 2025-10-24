@@ -1,11 +1,11 @@
+// src/pages/Reportes.tsx
 import { Maquinaria } from '@/constants/maquinaria';
 import { MaquinariaStore } from '@/services/maquinariaLocal';
+import { ReportesService } from '@/services/reportes';
 import { DownloadOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Button, message } from 'antd';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import React, { useEffect, useState } from 'react';
 
 const Reportes: React.FC = () => {
@@ -36,77 +36,24 @@ const Reportes: React.FC = () => {
     { title: 'Motor', dataIndex: 'motor', width: 150 },
   ];
 
-  const handleExportarPDF = () => {
-    if (data.length === 0) {
-      message.warning('No hay maquinaria registrada para exportar');
-      return;
-    }
-
-    try {
-      const doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'pt',
-        format: 'a4',
-      });
-
-      // Encabezado
-      doc.setFontSize(18);
-      doc.text('Reporte de Maquinaria Registrada', 40, 40);
-
-      const fecha = new Date().toLocaleString('es-GT', {
-        dateStyle: 'full',
-        timeStyle: 'short',
-      });
-      doc.setFontSize(10);
-      doc.text(`Generado el: ${fecha}`, 40, 60);
-
-      // Contenido de la tabla
-      const body = data.map((m, i) => [
-        i + 1,
-        m.nombre,
-        m.tipo,
-        m.descripcion || '-',
-        m.numero_serie,
-        m.motor || '-',
-      ]);
-
-      autoTable(doc, {
-        startY: 80,
-        head: [
-          ['#', 'Nombre', 'Tipo', 'Descripción', 'Número de Serie', 'Motor'],
-        ],
-        body,
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [33, 150, 243], halign: 'center' },
-        columnStyles: {
-          0: { halign: 'center', cellWidth: 30 },
-          1: { cellWidth: 120 },
-          2: { cellWidth: 100 },
-          3: { cellWidth: 200 },
-          4: { cellWidth: 100 },
-          5: { cellWidth: 100 },
-        },
-      });
-
-      // Esto es lo que funciona SIEMPRE en Brave 🔥
-      const pdfBlob = doc.output('blob');
-      const url = URL.createObjectURL(pdfBlob);
-      window.open(url, '_blank'); // Abre el PDF en una nueva pestaña
-
-      message.success(
-        'Reporte PDF generado. Se abrirá en una nueva pestaña ✅',
-      );
-    } catch (error) {
-      console.error(error);
-      message.error('Error al generar el PDF');
-    }
+  const abrirPdfBackend = (filters?: {
+    tipo?: string;
+    status?: string;
+    search?: string;
+  }) => {
+    const url = ReportesService.maquinasPdfUrl(filters);
+    // Si tu dev server usa proxy /api -> backend, esto funcionará.
+    // Abre en nueva pestaña (inline). Si necesitas forzar descarga, backend debe retornar attachment.
+    window.open(url, '_blank');
+    message.success('Se abrirá el reporte en una nueva pestaña');
   };
 
+  // Si tu endpoint requiere autenticación con token (Bearer), usa fetch y crear blob (ver nota abajo)
   return (
     <PageContainer
       header={{
         title: '📋 Reportes de Maquinaria',
-        subTitle: 'Genera y descarga el reporte en PDF',
+        subTitle: 'Reporte PDF generado por el servidor',
       }}
     >
       <ProTable<Maquinaria>
@@ -122,9 +69,9 @@ const Reportes: React.FC = () => {
             key="export"
             icon={<DownloadOutlined />}
             type="primary"
-            onClick={handleExportarPDF}
+            onClick={() => abrirPdfBackend()}
           >
-            Exportar PDF
+            Reporte PDF (Servidor)
           </Button>,
         ]}
       />

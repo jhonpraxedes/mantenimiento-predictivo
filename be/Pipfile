@@ -17,6 +17,7 @@ sqlalchemy = ">=2.0"
 psycopg2-binary = "*"
 python-dotenv = "*"
 alembic = "*"
+reportlab = "*"
 
 [dev-packages]
 pytest = "*"

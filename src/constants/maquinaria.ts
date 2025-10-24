@@ -1,3 +1,4 @@
+// src/constants/maquinaria.ts
 export const TIPOS_MAQUINARIA = [
   'Retroexcavadora',
   'Bulldozer',
@@ -10,19 +11,19 @@ export const TIPOS_MAQUINARIA = [
 export type TipoMaquinaria = (typeof TIPOS_MAQUINARIA)[number];
 
 export interface Maquinaria {
-  id: string;
+  id: number;
   nombre: string;
   descripcion?: string;
   numero_serie: string;
   motor?: string;
-  tipo: TipoMaquinaria;
+  tipo?: TipoMaquinaria | string;
   created_at?: string;
   updated_at?: string;
 }
 
 export const DATOS_INICIALES: Maquinaria[] = [
   {
-    id: '1',
+    id: 1,
     nombre: 'Excavadora CAT 320D',
     descripcion: 'Maquinaria de excavación de uso pesado',
     numero_serie: 'CAT320D-001',
@@ -32,7 +33,7 @@ export const DATOS_INICIALES: Maquinaria[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: '2',
+    id: 2,
     nombre: 'Bulldozer Komatsu D85EX',
     descripcion: 'Tractor para nivelación de terreno',
     numero_serie: 'KOMD85-045',
@@ -42,7 +43,7 @@ export const DATOS_INICIALES: Maquinaria[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: '3',
+    id: 3,
     nombre: 'Cargador Frontal Volvo L120F',
     descripcion: 'Cargador frontal para movimiento de agregados',
     numero_serie: 'VOL120F-076',
