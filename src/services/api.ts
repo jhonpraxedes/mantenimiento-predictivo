@@ -1,6 +1,6 @@
 // src/services/api.ts
 
-const BASE_URL = process.env.API_BASE_URL || 'http://0.0.0.0:8001/api'; // ajusta si usas proxy o envs
+const BASE_URL = 'http://0.0.0.0:8001'; // ajusta si usas proxy o envs
 
 type Query = Record<string, string | number | boolean | null | undefined>;
 
