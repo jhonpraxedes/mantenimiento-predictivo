@@ -15,6 +15,7 @@ export default () => {
     const success = await login(values);
     if (success) {
       message.success('Inicio de sesión exitoso');
+
       navigate('/dashboard');
     }
   };

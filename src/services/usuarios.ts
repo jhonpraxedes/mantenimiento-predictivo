@@ -9,7 +9,7 @@ export const UsuariosService = {
       code: string;
       role: string;
     }>({
-      path: 'users/login', // sin slash inicial: usará '/api/users/login' con BASE_URL = '/api'
+      path: '/users/login', // sin slash inicial: usará '/api/users/login' con BASE_URL = '/api'
       method: 'POST',
       body: credentials,
     });

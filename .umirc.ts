@@ -3,13 +3,6 @@ import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
   npmClient: 'pnpm',
-  proxy: {
-    '/api': {
-      target: 'http://127.0.0.1:8001', // <- apunta al backend
-      changeOrigin: true,
-      pathRewrite: { '^/api': '/api' },
-    },
-  },
   antd: {},
   access: {},
   model: {},
@@ -30,19 +23,19 @@ export default defineConfig({
       path: '/ingreso',
       name: 'Ingreso',
       component: './Ingreso',
-      access: 'canSeeAdmin',
+      access: 'isLoggedIn',
     },
     {
       path: '/usuarios',
       name: 'Usuarios',
       component: './Usuarios',
-      access: 'canseeAdmin', // Solo admin
+      access: 'isLoggedIn',
     },
     {
       path: '/dashboard',
       name: 'Dashboard',
       component: './Dashboard',
-      access: 'isLoggedin',
+      access: 'isLoggedIn',
     },
     {
       path: '/reportes',

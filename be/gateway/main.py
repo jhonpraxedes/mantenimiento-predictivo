@@ -22,7 +22,7 @@ app.include_router(users.router, prefix="/api/users", tags=["users"])
 app.include_router(maquinaria.router, prefix="/api/maquinas", tags=["maquinas"])
 app.include_router(lecturas.router, prefix="/api/lecturas", tags=["lecturas"])
 app.include_router(services.router, prefix="/api/services", tags=["services"])
-app.include_router(reportes_pdf.router, prefix="/api/reportes", tags=["reportes"])
+# app.include_router(reportes_pdf.router, prefix="/api/reportes", tags=["reportes"])
 
 @app.get("/")
 async def root():
@@ -34,4 +34,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("gateway.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("gateway.main:app", host="0.0.0.0", port=8001, reload=True)

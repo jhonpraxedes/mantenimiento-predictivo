@@ -6,7 +6,8 @@ import { Button, Space, Tag } from 'antd';
 export async function getInitialState() {
   const raw = localStorage.getItem('currentUser');
   const currentUser = raw ? JSON.parse(raw) : undefined;
-  return { currentUser };
+  const isLoggedIn = !!currentUser;
+  return { currentUser, isLoggedIn };
 }
 
 export const layout: RunTimeLayoutConfig = ({

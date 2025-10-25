@@ -12,8 +12,5 @@ export default function access(initialState: any) {
 
     // Operadores y administradores
     canOperator: role === 'Operador' || role === 'Administrador',
-
-    // Compatibilidad con rutas antiguas que usaban canSeeAdmin
-    canSeeAdmin: role === 'Administrador',
   };
 }

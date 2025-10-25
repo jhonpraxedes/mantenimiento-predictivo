@@ -1,8 +1,7 @@
 // src/services/api.ts
 type Query = Record<string, string | number | boolean | null | undefined>;
 
-const BASE_URL = '/api'; // usar proxy del dev server
-
+const BASE_URL = 'http://0.0.0.0:8001/api';
 function buildURL(path: string, query?: Query) {
   const clean = path.replace(/^\/+/, '');
   const url = `${BASE_URL}/${clean}`;
